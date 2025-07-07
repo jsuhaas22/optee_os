@@ -57,6 +57,7 @@
 #define SEC_PROXY_TIMEOUT_US            1000000
 #define GICC_BASE       (SCU_BASE + GICC_OFFSET)
 #define GICD_BASE       (SCU_BASE + GICD_OFFSET)
+#define TI_SCI_MAX_MESSAGE_SIZE         60
 
 /* SA2UL */
 #if defined(PLATFORM_FLAVOR_am65x)
