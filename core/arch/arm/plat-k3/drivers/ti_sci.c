@@ -147,8 +147,8 @@ static int ti_sci_do_xfer(struct ti_sci_xfer *xfer)
 		goto unlock;
 	}
 
-	FMSG("Receive %"PRIx16" with seq %"PRIu8" host %"PRIu8,
-	     rxhdr->type, rxhdr->seq, rxhdr->host);
+	FMSG("Receive %"PRIx16" with seq %"PRIu8" host %"PRIu8" flag %"PRIu32,
+	     rxhdr->type, rxhdr->seq, rxhdr->host, rxhdr->flags);
 
 unlock:
 	mutex_unlock(&ti_sci_mutex_lock);
