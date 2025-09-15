@@ -326,11 +326,16 @@ static TEE_Result __gcm_dec_final(struct internal_aes_gcm_state *state,
 		return TEE_ERROR_MAC_INVALID;
 
 	res = operation_final(state, enc_key, TEE_MODE_DECRYPT, src, len, dst);
+	DMSG("CUSTOM: __gcm_dec_final 1 %x", res);
 	if (res)
 		return res;
 
-	if (consttime_memcmp(state->buf_tag, tag, tag_len))
+	DMSG("CUSTOM: __gcm_dec_final 2: %p %p", state->buf_tag, tag);
+
+	if ((res = consttime_memcmp(state->buf_tag, tag, tag_len))) {
+		DMSG("CUSTOM: __gcm_dec_final 3 %x", res);
 		return TEE_ERROR_MAC_INVALID;
+	}
 
 	return TEE_SUCCESS;
 }
@@ -495,6 +500,7 @@ static TEE_Result aes_gcm_dec_final(struct crypto_authenc_ctx *aec,
 				    uint8_t *dst, const uint8_t *tag,
 				    size_t tag_len)
 {
+	DMSG("CUSTOM: aes_gcm_dec_final: 1");
 	return internal_aes_gcm_dec_final(&to_aes_gcm_ctx(aec)->ctx, src, len,
 					  dst, tag, tag_len);
 }

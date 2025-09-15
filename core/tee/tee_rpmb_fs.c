@@ -1924,6 +1924,7 @@ post_read_in:
 #if (TRACE_LEVEL >= TRACE_FLOW)
 static void dump_fat(void)
 {
+	DMSG("custom_dumpfat: Printing");
 	TEE_Result res = TEE_ERROR_SECURITY;
 	struct rpmb_fat_entry *fe = NULL;
 

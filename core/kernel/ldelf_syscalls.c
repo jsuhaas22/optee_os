@@ -160,7 +160,7 @@ TEE_Result ldelf_syscall_open_bin(const TEE_UUID *uuid, size_t uuid_size,
 	if (is_user_ta_ctx(sess->ctx) || is_stmm_ctx(sess->ctx)) {
 		SCATTERED_ARRAY_FOREACH(binh->op, ta_stores,
 					struct ts_store_ops) {
-			DMSG("Lookup user TA ELF %pUl (%s)",
+			DMSG("Lookup user TA ELF %p (%s)",
 			     (void *)bb_uuid, binh->op->description);
 
 			res = binh->op->open(bb_uuid, &binh->h);

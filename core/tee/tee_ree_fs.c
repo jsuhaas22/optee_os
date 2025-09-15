@@ -428,6 +428,8 @@ static TEE_Result ree_fs_open_primitive(bool create, uint8_t *hash,
 	TEE_Result res;
 	struct tee_fs_fd *fdp;
 
+	DMSG("ree_fs_open_primitive: here tee_ree_fs.c");
+
 	fdp = calloc(1, sizeof(struct tee_fs_fd));
 	if (!fdp)
 		return TEE_ERROR_OUT_OF_MEMORY;
@@ -447,6 +449,7 @@ static TEE_Result ree_fs_open_primitive(bool create, uint8_t *hash,
 				&ree_fs_storage_ops, fdp, &fdp->ht);
 out:
 	if (res == TEE_SUCCESS) {
+		DMSG("CUSTOM: TEE_SUCCESS: %d", res);
 		if (dfh)
 			fdp->dfh = *dfh;
 		else
@@ -600,6 +603,7 @@ static TEE_Result open_dirh(struct tee_fs_dirfile_dirh **dirh)
 	uint32_t min_counter = 0;
 
 	res = nv_counter_get_ree_fs(&min_counter);
+	DMSG("CUSTOM: open_dirh: 1 %x", res);
 	if (res) {
 		static bool once;
 
@@ -615,7 +619,9 @@ static TEE_Result open_dirh(struct tee_fs_dirfile_dirh **dirh)
 	}
 	res = tee_fs_dirfile_open(false, NULL, min_counter, &ree_dirf_ops,
 				  dirh);
+	DMSG("CUSTOM: open_dirh: 2 %x", res);	
 	if (res == TEE_ERROR_ITEM_NOT_FOUND) {
+		DMSG("CUSTOM: open_dirh: 3 %x", res);
 		if (min_counter) {
 			if (!IS_ENABLED(CFG_REE_FS_ALLOW_RESET)) {
 				DMSG("dirf.db file not found");
@@ -712,15 +718,19 @@ static TEE_Result ree_fs_open(struct tee_pobj *po, size_t *size,
 	struct tee_fs_dirfile_fileh dfh;
 
 	mutex_lock(&ree_fs_mutex);
-
+	DMSG("CUSTOM_ree_fs_open: tee_ree_fs.c 1");
 	res = get_dirh(&dirh);
-	if (res != TEE_SUCCESS)
+	if (res != TEE_SUCCESS) {
+		DMSG("CUSTOM_ree_fs_open: tee_ree_fs.c 5 %x", res);
 		goto out;
+	}
 
 	res = tee_fs_dirfile_find(dirh, &po->uuid, po->obj_id, po->obj_id_len,
 				  &dfh);
-	if (res != TEE_SUCCESS)
+	if (res != TEE_SUCCESS) {
+		DMSG("\n\nCUSTOM_ree_fs_open: tee_ree_fs.c 4\n\n");		
 		goto out;
+	}
 
 	res = ree_fs_open_primitive(false, dfh.hash, 0, &po->uuid, &dfh, fh);
 	if (res == TEE_ERROR_ITEM_NOT_FOUND) {
@@ -728,10 +738,11 @@ static TEE_Result ree_fs_open(struct tee_pobj *po, size_t *size,
 		 * If the object isn't found someone has tampered with it,
 		 * treat it as corrupt.
 		 */
+		DMSG("\n\nCUSTOM_ree_fs_open: tee_ree_fs.c 2 %x\n\n", res);
 		res = TEE_ERROR_CORRUPT_OBJECT;
 	} else if (!res && size) {
 		struct tee_fs_fd *fdp = (struct tee_fs_fd *)*fh;
-
+		DMSG("\n\nCUSTOM_ree_fs_open: tee_ree_fs.c 3\n\n");
 		*size = tee_fs_htree_get_meta(fdp->ht)->length;
 	}
 

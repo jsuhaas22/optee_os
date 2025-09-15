@@ -529,13 +529,19 @@ static TEE_Result authenc_decrypt_final(void *ctx, const uint8_t *tag,
 
 	res = crypto_authenc_dec_final(ctx, crypt, len, plain, &out_size, tag,
 				       TEE_FS_HTREE_TAG_SIZE);
+	DMSG("CUSTOM: authenc_decrypt_final 1: %x", res);
+	
 	crypto_authenc_final(ctx);
 	crypto_authenc_free_ctx(ctx);
 
-	if (res == TEE_SUCCESS && out_size != len)
+	if (res == TEE_SUCCESS && out_size != len) {
+		DMSG("CUSTOM_ authenc_decrypt_final 2: %x", res);
 		return TEE_ERROR_GENERIC;
-	if (res == TEE_ERROR_MAC_INVALID)
+	}
+	if (res == TEE_ERROR_MAC_INVALID) {
+		DMSG("CUSTOM_ authenc_decrypt_final 3: %x", res);
 		return TEE_ERROR_CORRUPT_OBJECT;
+	}
 
 	return res;
 }
@@ -570,9 +576,12 @@ static TEE_Result verify_root(struct tee_fs_htree *ht)
 	if (res != TEE_SUCCESS)
 		return res;
 
+	DMSG("CUSTOM: verify_root: 1 %x", res);
+
 	res = authenc_init(&ctx, TEE_MODE_DECRYPT, ht, NULL, sizeof(ht->imeta));
 	if (res != TEE_SUCCESS)
 		return res;
+	DMSG("CUSTOM: verify_root: 2 %x", res);	
 
 	return authenc_decrypt_final(ctx, ht->head.tag, ht->head.imeta,
 				     sizeof(ht->imeta), &ht->imeta);
@@ -638,6 +647,8 @@ TEE_Result tee_fs_htree_open(bool create, uint8_t *hash, uint32_t min_counter,
 	TEE_Result res;
 	struct tee_fs_htree *ht = calloc(1, sizeof(*ht));
 
+	DMSG("CUSTOM: tee_fs_hstree_open: 1");
+
 	if (!ht)
 		return TEE_ERROR_OUT_OF_MEMORY;
 
@@ -653,35 +664,47 @@ TEE_Result tee_fs_htree_open(bool create, uint8_t *hash, uint32_t min_counter,
 		res = crypto_rng_read(ht->fek, sizeof(ht->fek));
 		if (res != TEE_SUCCESS)
 			goto out;
+		DMSG("CUSTOM: tee_fs_hstree_open: 2 %x", res);
 
 		res = tee_fs_fek_crypt(ht->uuid, TEE_MODE_ENCRYPT, ht->fek,
 				       sizeof(ht->fek), ht->head.enc_fek);
 		if (res != TEE_SUCCESS)
 			goto out;
-
+		
+		DMSG("CUSTOM: tee_fs_hstree_open: 3 %x", res);
+		
 		res = init_root_node(ht);
 		if (res != TEE_SUCCESS)
 			goto out;
 
+		DMSG("CUSTOM: tee_fs_hstree_open: 4 %x", res);
+		
 		ht->dirty = true;
 		res = tee_fs_htree_sync_to_storage(&ht, hash, NULL);
 		if (res != TEE_SUCCESS)
 			goto out;
 		res = rpc_write_head(ht, 0, &dummy_head);
+
+		DMSG("CUSTOM: tee_fs_hstree_open: 5 %x", res);
 	} else {
 		res = init_head_from_data(ht, hash, min_counter);
 		if (res != TEE_SUCCESS)
 			goto out;
+		DMSG("CUSTOM: tee_fs_hstree_open: 6 %x", res);
 
 		res = verify_root(ht);
+		DMSG("CUSTOM: tee_fs_hstree_open: 7 %x", res);
 		if (res != TEE_SUCCESS)
 			goto out;
+
 
 		res = init_tree_from_data(ht);
 		if (res != TEE_SUCCESS)
 			goto out;
+		DMSG("CUSTOM: tee_fs_hstree_open: 8 %x", res);
 
 		res = verify_tree(ht);
+		DMSG("CUSTOM: tee_fs_hstree_open: 9 %x", res);
 	}
 out:
 	if (res == TEE_SUCCESS)

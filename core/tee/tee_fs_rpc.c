@@ -83,6 +83,7 @@ static TEE_Result operation_open_dfh(uint32_t id, unsigned int cmd,
 TEE_Result tee_fs_rpc_open_dfh(uint32_t id,
 			       const struct tee_fs_dirfile_fileh *dfh, int *fd)
 {
+	DMSG("CUSTOM: tee_fs_rpc_open_dfh");
 	return operation_open_dfh(id, OPTEE_RPC_FS_OPEN, dfh, fd);
 }
 
@@ -90,6 +91,7 @@ TEE_Result tee_fs_rpc_create_dfh(uint32_t id,
 				 const struct tee_fs_dirfile_fileh *dfh,
 				 int *fd)
 {
+	DMSG("CUSTOM: tee_fs_rpc_create_dfh");
 	return operation_open_dfh(id, OPTEE_RPC_FS_CREATE, dfh, fd);
 }
 

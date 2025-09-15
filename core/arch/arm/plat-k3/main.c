@@ -59,6 +59,7 @@ void plat_console_init(void)
 static TEE_Result init_ti_sci(void)
 {
 	TEE_Result ret = TEE_SUCCESS;
+	DMSG("CUSTOM_init_ti_sci");
 
 	ret = ti_sci_transport_init();
 	if (ret != TEE_SUCCESS)
@@ -105,6 +106,7 @@ TEE_Result tee_otp_get_hw_unique_key(struct tee_hw_unique_key *hwkey)
 
 	assert(SA2UL_DKEK_KEY_LEN >= HW_UNIQUE_KEY_LENGTH);
 
+	DMSG("custom: tee_otp_..._key: Before dkek()");
 	ret = ti_sci_get_dkek(0, "OP-TEE", "DKEK", dkek);
 	if (ret) {
 		EMSG("Could not get HUK");

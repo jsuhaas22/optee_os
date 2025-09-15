@@ -583,6 +583,8 @@ static void *mem_alloc_unlocked(uint32_t flags, void *ptr, size_t alignment,
 		ptr = hdr;
 	}
 
+	//	DMSG("\nCUSTOM_mem_alloc_unlocked: After if(IS_ENABLED2), ptr = %p\n", ptr);
+
 	ptr = raw_malloc_flags(flags, ptr, hdr_size, ftr_size, alignment, nmemb,
 			       size, ctx);
 
@@ -665,6 +667,7 @@ static void *get_payload_start_size(void *raw_buf, size_t *size)
 void *__mdbg_alloc(uint32_t flags, void *ptr, size_t alignment, size_t nmemb,
 		   size_t size, const char *fname, int lineno)
 {
+	DMSG("\nCUSTOM: mdbg_alloc\n");
 	return mem_alloc(flags, ptr, alignment, nmemb, size, fname, lineno);
 }
 
@@ -723,6 +726,7 @@ void *malloc_flags(uint32_t flags, void *ptr, size_t alignment, size_t size)
 #undef calloc
 void *calloc(size_t nmemb, size_t size)
 {
+	//	DMSG("\nCUSTOM: bget_malloc calloc\n");
 	return mem_alloc(MAF_ZERO_INIT, NULL, 1, nmemb, size, __FILE__,
 			 __LINE__);
 }

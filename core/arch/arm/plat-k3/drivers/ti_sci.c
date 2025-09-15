@@ -321,11 +321,13 @@ int ti_sci_get_dkek(uint8_t sa2ul_instance,
 	struct ti_sci_xfer xfer = { };
 	int ret = 0;
 
+	FMSG("custom: dkek: Before setup_xfer");
 	ret = ti_sci_setup_xfer(TI_SCI_MSG_SA2UL_GET_DKEK, 0,
 				&req, sizeof(req), &resp, sizeof(resp), &xfer);
 	if (ret)
 		return ret;
-
+	FMSG("custom: dkek: After setup_xfer");
+	
 	req.sa2ul_instance = sa2ul_instance;
 	req.kdf_label_len = strlen(label);
 	req.kdf_context_len = strlen(context);
@@ -338,10 +340,12 @@ int ti_sci_get_dkek(uint8_t sa2ul_instance,
 	memcpy(req.kdf_label_and_context + strlen(label), context,
 	       strlen(context));
 
+	FMSG("custom: dkek: Before do_xfer");
 	ret = ti_sci_do_xfer(&xfer);
 	if (ret)
 		return ret;
-
+	FMSG("custom: dkek: After do_xfer");
+	
 	memcpy(dkek, resp.dkek, sizeof(resp.dkek));
 	memzero_explicit(&resp, sizeof(resp));
 	return 0;

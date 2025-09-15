@@ -359,6 +359,8 @@ static void entry_open_session(struct optee_msg_arg *arg, uint32_t num_params)
 	size_t num_meta = 0;
 	uint64_t saved_attr[TEE_NUM_PARAMS] = { 0 };
 
+	DMSG("\n\nCUSTOM_entry_open_session: entry_std.c\n\n");
+
 	res = get_open_session_meta(num_params, arg->params, &num_meta, &uuid,
 				    &clnt_id);
 	if (res != TEE_SUCCESS)

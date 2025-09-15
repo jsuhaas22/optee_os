@@ -331,6 +331,8 @@ static TEE_Result entry_open_session(unsigned long session_id,
 	uint32_t param_types;
 	TEE_Param params[TEE_NUM_PARAMS];
 
+	DMSG("\n\nCUSTOM_entry_open_sessoin: user_ta_entry.c\n\n");
+
 	res = ta_header_add_session(session_id);
 	if (res != TEE_SUCCESS)
 		return res;

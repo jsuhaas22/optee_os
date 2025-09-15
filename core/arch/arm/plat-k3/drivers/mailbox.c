@@ -36,6 +36,8 @@ static TEE_Result ti_mailbox_poll_rx_status(void)
 	uint32_t num_messages_pending = 0U;
 	uint32_t retry_count = 100U;
 
+	FMSG("CUSTOM: ti_mailbox_poll_rx_status: Begun");
+
 	while (num_messages_pending == 0U) {
 		num_messages_pending = io_read32(mailbox_ctx->rx_base +
 						 TI_MAILBOX_MSG_STATUS);
@@ -47,6 +49,8 @@ static TEE_Result ti_mailbox_poll_rx_status(void)
 		mdelay(10);
 	}
 
+	FMSG("CUSTOM: ti_mailbox_poll_rx_status: End");
+
 	return TEE_SUCCESS;
 }
 
@@ -54,6 +58,8 @@ TEE_Result ti_sci_transport_send(const struct ti_sci_msg *msg)
 {
 	uint32_t num_bytes;
 	paddr_t phys_addr;
+
+	FMSG("CUSTOM: ti_sci_transport_send: Begun");
 
 	if (!msg)
 		return TEE_ERROR_BAD_PARAMETERS;
@@ -66,6 +72,8 @@ TEE_Result ti_sci_transport_send(const struct ti_sci_msg *msg)
 		return TEE_ERROR_BUSY;
 	}
 
+	FMSG("CUSTOM: ti_sci_transport_send: Middle");
+
 	if (num_bytes > MAILBOX_MAX_MESSAGE_SIZE) {
 		EMSG("Message size exceeds maximum allowed size");
 		return TEE_ERROR_BAD_STATE;
@@ -74,6 +82,8 @@ TEE_Result ti_sci_transport_send(const struct ti_sci_msg *msg)
 	memmove((void *)mailbox_ctx->tx_sram_va, msg->buf, num_bytes);
 	phys_addr = virt_to_phys((void *)mailbox_ctx->tx_sram_va);
 	io_write32(mailbox_ctx->tx_base + TI_MAILBOX_MSG, (uint32_t)phys_addr);
+
+	FMSG("CUSTOM: ti_sci_transport_recv: End");
 
 	return TEE_SUCCESS;
 }
@@ -84,6 +94,8 @@ TEE_Result ti_sci_transport_recv(struct ti_sci_msg *msg)
 	uint64_t recv_pa;
 	void *recv_va;
 	TEE_Result ret = TEE_SUCCESS;
+
+	FMSG("CUSTOM: ti_sci_transport_recv: Begun");
 
 	if (!msg)
 		return TEE_ERROR_BAD_PARAMETERS;
@@ -102,6 +114,8 @@ TEE_Result ti_sci_transport_recv(struct ti_sci_msg *msg)
 		return TEE_ERROR_BAD_FORMAT;
 	}
 
+	FMSG("CUSTOM: ti_sci_transport_recv: Middle");
+
 	if (num_bytes > MAILBOX_MAX_MESSAGE_SIZE) {
 		EMSG("Message size exceeds maximum allowed size\n");
 		return TEE_ERROR_BAD_STATE;
@@ -113,7 +127,10 @@ TEE_Result ti_sci_transport_recv(struct ti_sci_msg *msg)
 		return TEE_ERROR_COMMUNICATION;
 	}
 
+	FMSG("CUSTOM: ti_sci_transport_recv: Almost end");
+
 	memmove(msg->buf, (uint8_t *)recv_va, num_bytes);
+	FMSG("CUSTOM: ti_sci_transport_recv: Ended");
 	return TEE_SUCCESS;
 }
 
@@ -121,6 +138,8 @@ TEE_Result ti_sci_transport_clear_thread(uint32_t chan_id)
 {
 	uint32_t try_count;
 	(void)chan_id;
+
+	FMSG("CUSTOM: ti_sci_transport_clear_thread: begun");
 
 	try_count = io_read32(mailbox_ctx->rx_base + TI_MAILBOX_MSG_STATUS);
 	while (io_read32(mailbox_ctx->rx_base +
@@ -132,12 +151,14 @@ TEE_Result ti_sci_transport_clear_thread(uint32_t chan_id)
 		}
 		try_count--;
 	}
+	FMSG("CUSTOM: ti_sci_transport_clear_thread: ended");
 
 	return TEE_SUCCESS;
 }
 
 TEE_Result ti_sci_transport_init(void)
 {
+	FMSG("CUSTOM: ti_sci_transport_init: begun");
 	mailbox_ctx->rx_base = core_mmu_get_va(TI_MAILBOX_RX_BASE,
 					       MEM_AREA_IO_SEC, 0x1000);
 	if (!mailbox_ctx->rx_base)
@@ -145,6 +166,8 @@ TEE_Result ti_sci_transport_init(void)
 
 	mailbox_ctx->tx_base = core_mmu_get_va(TI_MAILBOX_TX_BASE,
 					       MEM_AREA_IO_SEC, 0x1000);
+
+	FMSG("CUSTOM: ti_sci_transport_init: middle");
 	if (!mailbox_ctx->tx_base)
 		return TEE_ERROR_OUT_OF_MEMORY;
 
@@ -152,6 +175,8 @@ TEE_Result ti_sci_transport_init(void)
 						  MEM_AREA_IO_SEC, 0x1000);
 	if (!mailbox_ctx->tx_sram_va)
 		return TEE_ERROR_OUT_OF_MEMORY;
+
+	FMSG("CUSTOM: ti_sci_transport_init: success");
 
 	return TEE_SUCCESS;
 }
