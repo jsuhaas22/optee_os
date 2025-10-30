@@ -15,6 +15,7 @@ TEE_Result ti_crypto_init_rng_fwl(uint16_t fwl_id, uint16_t sec_accel_region)
 	uint64_t end_address = 0;
 	int ret = 0;
 
+#if !defined(PLATFORM_FLAVOR_am62lx)
 	/* Try to claim Security Accelerator firewall for ourselves */
 	ret = ti_sci_change_fwl_owner(fwl_id, sec_accel_region, owner_index,
 				      &owner_privid, &owner_permission_bits);
@@ -48,6 +49,8 @@ TEE_Result ti_crypto_init_rng_fwl(uint16_t fwl_id, uint16_t sec_accel_region)
 			return TEE_ERROR_GENERIC;
 		}
 	}
+#endif
+
 	/* Claim the TRNG firewall for ourselves */
 	ret = ti_sci_change_fwl_owner(fwl_id, rng_region, owner_index,
 				      &owner_privid, &owner_permission_bits);
