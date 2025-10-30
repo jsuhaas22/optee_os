@@ -209,6 +209,18 @@ int ti_sci_set_keyrev(uint32_t keyrev,
 		      uint32_t cert_addr_hi);
 
 /**
+ * ti_sci_rng_fwl - Initialize RNG firewall
+ * @fwl_id:  ID of firewall protecting the security accelerator
+ * @sec_accel_region: Firewall region ID for security accelerator
+ *
+ * Firewalls the security accelerator (on GP devices) and the TRNG
+ * block.
+ *
+ * Return: 0 if all goes well, else appropriate error message
+ */
+int ti_sci_init_rng_fwl(uint16_t fwl_id, uint16_t sec_accel_region);
+
+/**
  * ti_sci_init() - Basic initialization
  *
  * Return: 0 if all goes well, else appropriate error message
